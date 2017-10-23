@@ -4,7 +4,8 @@
   "main": "dist/codice.fiscale.js",
   "authors": [
     "Luca Vandro",
-    "Walter Barbagallo"
+    "Walter Barbagallo",
+    "Mosè Raguzzini"
   ],
   "license": "MIT",
   "keywords": [
@@ -15,7 +16,7 @@
     "security",
     "number"
   ],
-  "homepage": "https://github.com/lucavandro/CodiceFiscaleJS",
+  "homepage": "https://github.com/bionicvapourboy/CodiceFiscaleJS",
   "moduleType": [],
   "ignore": [
     "**/.*",

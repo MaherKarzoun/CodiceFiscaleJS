@@ -1,11 +1,11 @@
 {
-  "name": "codice-fiscale-js",
+  "name": "calcolo-codice-fiscale",
   "version": "1.1.1",
-  "description": "Calcolo del codice fiscale",
-  "main": "lib/codice.fiscale.js",
+  "description": "Calcolo del codice fiscale, originally forked form git://github.com/lucavandro/CodiceFiscaleJS.git",
+  "main": "dist/codice.fiscale.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/lucavandro/CodiceFiscaleJS.git"
+    "url": "git://github.com/bionicvapourboy/CodiceFiscaleJS"
   },
   "directories": {
     "test": "tests"
@@ -28,9 +28,10 @@
     "pretest": "npm run build",
     "test": "npm run build && karma start"
   },
-  "author": "Luca Vandro <lucavandro@gmail.com>",
+  "author": "Mosè Raguzzini <mose.raguzzini@gmail.com>",
   "contributors": [
-    "Walter Barbagallo <brb.walter@gmail.com>"
+    "Walter Barbagallo <brb.walter@gmail.com>",
+    "Luca Vandro <lucavandro@gmail.com>"
   ],
   "license": "MIT"
 }
