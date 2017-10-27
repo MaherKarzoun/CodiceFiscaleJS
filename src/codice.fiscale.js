@@ -1,218 +1,174 @@
 const catastalCodes = require('./catastal-codes.json')
+let MONTH_CODES = ["A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"];
+const CHECK_CODE_ODD = { 0: 1, 1: 0, 2: 5, 3: 7, 4: 9, 5: 13, 6: 15, 7: 17, 8: 19, 9: 21, A: 1, B: 0, C: 5, D: 7, E: 9, F: 13, G: 15, H: 17, I: 19, J: 21, K: 2, L: 4, M: 18, N: 20, O: 11, P: 3, Q: 6, R: 8, S: 12, T: 14, U: 16, V: 10, W: 22, X: 25, Y: 24, Z: 23 };
+const CHECK_CODE_EVEN = { 0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, G: 6, H: 7, I: 8, J: 9, K: 10, L: 11, M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20, V: 21, W: 22, X: 23, Y: 24, Z: 25 };
+const OMOCODIA_TABLE = { "0": "L", "1": "M", "2": "N", "3": "P", "4": "Q", "5": "R", "6": "S", "7": "T", "8": "U", "9": "V" };
+const CHECK_CODE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const CODICI_CATASTALI = catastalCodes;
 
-export const compute = (name,surname,gender,day,month,year,birthplace, birthplace_provincia) => {
-    
-    // Pass an object as parameter
-    if(
-      typeof name == 'object'
-    ){
-        var params = name;
-        name       = params['name'],
-        surname    = params['surname'],
-        gender     = params['gender'],
-        day        = params['day'],
-        month      = params['month'],
-        year       = params['year'],
-        birthplace = params['birthplace'],
-        birthplace_provincia = params['birthplace_provincia'];
-    }
+export class CalcolaCodiceFiscale {
+        
+         static compute = (name, surname, gender, day, month, year, birthplace, birthplace_provincia) => {
+           const c = CalcolaCodiceFiscale;
+           // Pass an object as parameter
+           let params;
+           if (typeof name == "object") {
+             params = name;
+             (name = params["name"]), (surname = params["surname"]), (gender = params["gender"]), (day = params["day"]), (month = params["month"]), (year = params["year"]), (birthplace = params["birthplace"]), (birthplace_provincia = params["birthplace_provincia"]);
+           }
 
-    var code=
-      this.surnameCode(surname)+
-      this.nameCode(name)+
-      this.dateCode(day,month,year,gender)+
-      this.findComuneCode(birthplace, birthplace_provincia);
+           var code = c.surnameCode(surname) + c.nameCode(name) + c.dateCode(day, month, year, gender) + c.findComuneCode(birthplace, birthplace_provincia);
 
-    code+=this.getCheckCode(code);
+           code += c.getCheckCode(code);
 
-    return code;
+           return code;
+         };
 
-}
+         static check = codiceFiscale => {
+           const c = CalcolaCodiceFiscale;
+           if (typeof codiceFiscale !== "string") return falsedirettore;
+           codiceFiscale = codiceFiscale.toUpperCase();
+           if (codiceFiscale.length !== 16) return false;
+           const expectedCheckCode = codiceFiscale.charAt(15);
+           const cf = codiceFiscale.slice(0, 15);
 
-export const check = (codiceFiscale) => {
-  if(typeof codiceFiscale !== 'string') return false;
-  codiceFiscale = codiceFiscale.toUpperCase();
-  if(codiceFiscale.length !== 16) return false;
-  var expectedCheckCode = codiceFiscale.charAt(15);
-  var cf = codiceFiscale.slice(0,15);
+           return c.getCheckCode(cf) == expectedCheckCode;
+         };
 
-  return CodiceFiscale.getCheckCode(cf) == expectedCheckCode;
+         static getCheckCode = codiceFiscale => {
+          const c = CalcolaCodiceFiscale; 
+          let val = 0;
+           for (var i = 0; i < 15; i++) {
+             let cf = codiceFiscale[i];
+             val += i % 2 ? CHECK_CODE_EVEN[cf] : CHECK_CODE_ODD[cf];
+           }
+           val = val % 26;
+           return CHECK_CODE_CHARS.charAt(val);
+         };
 
-}
+         static estraiConsonanti = function(str) {
+           return str.replace(/[^BCDFGHJKLMNPQRSTVWXYZ]/gi, "");
+         };
 
-export const getCheckCode = (codiceFiscale) => {
-  var val=0;
-  for(var i=0; i<15 ;i++){
-    var c=codiceFiscale[i];
-    val+= i%2 ? this.CHECK_CODE_EVEN[c] : this.CHECK_CODE_ODD[c];
-  }
-  val=val%26;
-  return this.CHECK_CODE_CHARS.charAt(val);
-}
+         static estraiVocali = function(str) {
+           return str.replace(/[^AEIOU]/gi, "");
+           MONTH_CODES = ["A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"];
+         };
 
-export const estraiConsonanti=function(str){
-  return str.replace(/[^BCDFGHJKLMNPQRSTVWXYZ]/gi,'');
-}
+         static surnameCode = surname => {
+          const c = CalcolaCodiceFiscale;
+          const code_surname = c.estraiConsonanti(surname) + c.estraiVocali(surname) + "XXX";
+           return code_surname.substr(0, 3).toUpperCase();
+         };
 
-export const estraiVocali=function(str){
-  return str.replace(/[^AEIOU]/gi,'');
-}
+         static nameCode = name => {
+           const c = CalcolaCodiceFiscale;
+           let codNome = c.estraiConsonanti(name);
+           if (codNome.length >= 4) {
+             codNome = codNome.charAt(0) + codNome.charAt(2) + codNome.charAt(3);
+           } else {
+             codNome += c.estraiVocali(name) + "XXX";
+             codNome = codNome.substr(0, 3);
+           }
+           return codNome.toUpperCase();
+         };
 
-export const surnameCode = (surname) => {
-  var code_surname = this.estraiConsonanti(surname) + this.estraiVocali(surname) + 'XXX';
-  return code_surname.substr(0,3).toUpperCase();
-}
+         static dateCode = (gg, mm, aa, gender) => {
+           const c = CalcolaCodiceFiscale;
+           let date = new Date();
+           date.setYear(aa);
+           date.setMonth(mm - 1);
+           date.setDate(gg);
+           // Padding year
+           let year = "0" + date.getFullYear();
+           year = year.substr(year.length - 2, 2);
 
-export const nameCode = (name) => {
-  var codNome = this.estraiConsonanti(name);
-  if(codNome.length>=4){
-    codNome= codNome.charAt(0) + codNome.charAt(2) + codNome.charAt(3);
-  }else{
-    codNome+= this.estraiVocali(name) + 'XXX';
-    codNome=codNome.substr(0,3);
-  }
-  return codNome.toUpperCase();
-}
+           var month = MONTH_CODES[date.getMonth()];
+           var day = date.getDate();
+           if (gender.toUpperCase() == "F") day += 40;
 
-export const dateCode = (gg,mm,aa,gender) => {
-  var date=new Date();
-  date.setYear(aa);
-  date.setMonth(mm-1);
-  date.setDate(gg);
-  // Padding year
-  var year="0"+date.getFullYear();
-  year=year.substr(year.length-2,2);
+           // Padding daycompute
+           day = "0" + day;
+           day = day.substr(day.length - 2, 2);
+           return String(year + month + day);
+         };
 
-  var month=this.MONTH_CODES[date.getMonth()];
-  var day=date.getDate();
-  if(gender.toUpperCase()=='F') day+=40;
+         static findComuneCode = (birthplace, birthplace_provincia) => {
+           const c = CalcolaCodiceFiscale;
+           for (var i = CODICI_CATASTALI[birthplace_provincia].length - 1; i >= 0; i--) {
+             var comune = CODICI_CATASTALI[birthplace_provincia][i];
+             if (comune[0] == birthplace
+                 .trim()
+                 .toUpperCase()) return comune[1];
+           }
+           throw Error("Comune not found");
+         };
 
-  // Padding daycompute
-  day="0"+day;
-  day=day.substr(day.length-2,2);
-  return String(year+month+day);
-}
+         static getOmocodie = function(code) {
+           const c = CalcolaCodiceFiscale;
+           let results = [];
+           let lastOmocode = (code = code.slice(0, 15));
+           for (var i = code.length - 1; i >= 0; i--) {
+             var char = code[i];
+             if (char.match(/\d/)) {
+               lastOmocode = lastOmocode.substr(0, i) + OMOCODIA_TABLE[char] + lastOmocode.substr(i + 1);
+               results.push(lastOmocode + c.getCheckCode(lastOmocode));
+             }
+           }
+           return results;
+         };
 
+         static computeInverse = codiceFiscale => {
+           const isValid = this.check(codiceFiscale);
 
-export const findComuneCode = (birthplace, birthplace_provincia) => {
-  for (var i = this.CODICI_CATASTALI[birthplace_provincia].length - 1; i >= 0; i--) {
-    var comune = this.CODICI_CATASTALI[birthplace_provincia][i];
-    if(comune[0] == birthplace.trim().toUpperCase()) return comune[1];
-  }
-  throw Error("Comune not found");
-}
+           if (isValid) {
+             codiceFiscale = codiceFiscale.toUpperCase();
+           } else {
+             throw new TypeError("'" + codiceFiscale + "' is not a valid Codice Fiscale");
+           }
 
-export const getOmocodie = function(code){
-  var results = [];
-  var lastOmocode = code = code.slice(0,15);
-  for (var i = code.length - 1; i >= 0; i--) {
-    var char = code[i];
-    if(char.match(/\d/)){
-      lastOmocode = lastOmocode.substr(0,i) + this.OMOCODIA_TABLE[char] + lastOmocode.substr(i+1);
-      results.push(lastOmocode + this.getCheckCode(lastOmocode));
-    }
-  }
-  return results;
-}
+           const name = codiceFiscale.substr(3, 3);
+           const surname = codiceFiscale.substr(0, 3);
 
-export const computeInverse = (codiceFiscale) => {
-  var isValid = this.check(codiceFiscale);
+           const year = codiceFiscale.substr(6, 2);
+           let yearList = [];
+           const year19XX = parseInt("19" + year);
+           const year20XX = parseInt("20" + year);
+           const currentYear20XX = new Date().getFullYear();
+           yearList.push(year19XX);
+           if (currentYear20XX - year20XX >= 0) {
+             yearList.push(year20XX);
+           }
 
-  if (isValid) {
-    codiceFiscale = codiceFiscale.toUpperCase();
-  } else {
-    throw new TypeError('\'' + codiceFiscale + '\' is not a valid Codice Fiscale');
-  }
+           const monthChar = codiceFiscale.substr(8, 1);
+           const month = this.MONTH_CODES.indexOf(monthChar) + 1;
 
-  var name = codiceFiscale.substr(3, 3);
-  var surname = codiceFiscale.substr(0, 3);
-  
-  var year = codiceFiscale.substr(6, 2);
-  var yearList = [];
-  var year19XX = parseInt('19' + year);
-  var year20XX = parseInt('20' + year);
-  var currentYear20XX = (new Date()).getFullYear();
-  yearList.push(year19XX);
-  if (currentYear20XX - year20XX >= 0) {
-    yearList.push(year20XX);
-  }
+           let gender = "M";
+           let day = parseInt(codiceFiscale.substr(9, 2));
+           if (day > 31) {
+             gender = "F";
+             day = day - 40;
+           }
 
-  var monthChar = codiceFiscale.substr(8, 1);
-  var month = this.MONTH_CODES.indexOf(monthChar) + 1;
+           let birthplace = "";
+           let birthplace_provincia = "";
+           for (let province in CODICI_CATASTALI) {
+             birthplace = CODICI_CATASTALI[province].find(function(
+               code
+             ) {
+               return code[1] === codiceFiscale.substr(11, 4);
+             });
+             if (!!birthplace) {
+               birthplace = birthplace[0];
+               birthplace_provincia = province;
+               break;
+             }
+           }
 
-  var gender = 'M';
-  var day = parseInt(codiceFiscale.substr(9, 2));
-  if (day > 31) {
-    gender = 'F';
-    day = day - 40;
-  }
+           return { name: name, surname: surname, gender: gender, day: day, month: month, year: yearList, birthplace: birthplace, birthplace_provincia: birthplace_provincia };
+         };
 
-  var birthplace = '';
-  var birthplace_provincia = '';
-  for (var province in this.CODICI_CATASTALI) {
-    birthplace = this.CODICI_CATASTALI[province].find(function(code) {
-      return code[1] === codiceFiscale.substr(11, 4);
-    })
-    if (!!birthplace) {
-      birthplace = birthplace[0];
-      birthplace_provincia = province;
-      break
-    }
-  }
+      
+       }
 
-  return {
-    name:                 name,
-    surname:              surname,
-    gender:               gender,
-    day:                  day,
-    month:                month,
-    year:                 yearList,
-    birthplace:           birthplace,
-    birthplace_provincia: birthplace_provincia
-  }
-}
-
-
-export const MONTH_CODES = ['A','B','C','D','E','H','L','M','P','R','S','T'];
-
-export const CHECK_CODE_ODD = {
-  0:1,  1:0,  2:5,  3:7,  4:9,  5:13, 6:15, 7:17, 8:19,
-  9:21, A:1,  B:0,  C:5,  D:7,  E:9,  F:13, G:15, H:17,
-  I:19, J:21, K:2,  L:4,  M:18, N:20, O:11, P:3,  Q:6,
-  R:8,  S:12, T:14, U:16, V:10, W:22, X:25, Y:24, Z:23
-};
-
-export const CHECK_CODE_EVEN = {
-  0:0,  1:1,   2:2,  3:3,   4:4,  5:5,  6:6,  7:7,  8:8,
-  9:9,  A:0,   B:1,  C:2,   D:3,  E:4,  F:5,  G:6,  H:7,
-  I:8,  J:9,   K:10, L:11,  M:12, N:13, O:14, P:15, Q:16,
-  R:17, S:18,  T:19, U:20,  V:21, W:22, X:23, Y:24, Z:25
-};
-
-export const OMOCODIA_TABLE = {
-  "0":"L", "1":"M", "2":"N", "3":"P", "4":"Q",
-  "5":"R", "6":"S", "7":"T", "8":"U", "9":"V"}
-
-export const CHECK_CODE_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-export const CODICI_CATASTALI = catastalCodes
-
-export default {
-  compute,
-  check,
-  getCheckCode,
-  estraiConsonanti,
-  estraiVocali,
-  surnameCode,
-  nameCode,
-  dateCode,
-  findComuneCode,
-  getOmocodie,
-  computeInverse,
-  MONTH_CODES,
-  CHECK_CODE_ODD,
-  CHECK_CODE_EVEN,
-  OMOCODIA_TABLE,
-  CHECK_CODE_CHARS,
-  CODICI_CATASTALI
-};
+export default CalcolaCodiceFiscale;
