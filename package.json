@@ -2,7 +2,7 @@
   "name": "calcolo-codice-fiscale",
   "version": "1.1.1",
   "description": "Calcolo del codice fiscale, originally forked form git://github.com/lucavandro/CodiceFiscaleJS.git",
-  "main": "dist/codice.fiscale.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/bionicvapourboy/CodiceFiscaleJS"
@@ -21,10 +21,11 @@
     "typescript": "^2.5.2",
     "uglify-js": "^2.8.11",
     "uglifyjs-webpack-plugin": "^0.3.0",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "cross-env": "^5.1.0"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "cross-env webpack -p",
     "pretest": "npm run build",
     "test": "npm run build && karma start"
   },
