@@ -1,6 +1,6 @@
 {
   "name": "calcolo-codice-fiscale",
-  "version": "1.1.3",
+  "version": "1.1.31",
   "description": "Calcolo del codice fiscale, originally forked form git://github.com/lucavandro/CodiceFiscaleJS.git",
   "main": "build/index.js",
   "repository": {
