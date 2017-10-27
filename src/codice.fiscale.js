@@ -1,6 +1,6 @@
 const catastalCodes = require('./catastal-codes.json')
 
-var CodiceFiscale={}
+let CodiceFiscale={}
 
 CodiceFiscale.compute=function(name,surname,gender,day,month,year,birthplace, birthplace_provincia){
     
@@ -198,4 +198,4 @@ CodiceFiscale.CHECK_CODE_CHARS="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 CodiceFiscale.CODICI_CATASTALI = catastalCodes
 
-module.exports = CodiceFiscale;
+export default CodiceFiscale;

@@ -1,19 +1,26 @@
-const path = require('path'),
-      UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
-
+var path = require('path');
 module.exports = {
-  entry: {
-    'codice.fiscale': './src/codice.fiscale.js'
-  },
+  entry: './src/codice.fiscale.js',
   output: {
-    // this will publish the module on the window object in order to support the karma tests
-    library: 'CodiceFiscale',
-    libraryTarget: 'umd',
+    path: path.resolve(__dirname, 'build'),
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist')
+    libraryTarget: 'umd' // THIS IS THE MOST IMPORTANT LINE! :mindblow: I wasted more than 2 days until realize this was the line most important in all this guide.
   },
-  plugins: [
-    new UglifyJSPlugin()
-  ]
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        include: path.resolve(__dirname, 'src'),
+        exclude: /(node_modules|bower_components|build)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env'],
+            plugins: [require('babel-plugin-transform-class-properties')]
+          }
+        }
+      }
+    ]
+  },
+  externals: {}
 };
