@@ -75,14 +75,13 @@ export class CalcolaCodiceFiscale {
 
          static dateCode = (gg, mm, aa, gender) => {
            const c = CalcolaCodiceFiscale;
-           let date = new Date();
-           date.setYear(aa);
-           date.setMonth(mm - 1);
-           date.setDate(gg);
+           let date = new Date(aa, mm-1, gg);
+           
            // Padding year
+           console.log("MONTH", date.getMonth());
            let year = "0" + date.getFullYear();
            year = year.substr(year.length - 2, 2);
-
+           
            var month = MONTH_CODES[date.getMonth()];
            var day = date.getDate();
            if (gender.toUpperCase() == "F") day += 40;
@@ -90,6 +89,8 @@ export class CalcolaCodiceFiscale {
            // Padding daycompute
            day = "0" + day;
            day = day.substr(day.length - 2, 2);
+           date.setMonth(mm - 1);
+           
            return String(year + month + day);
          };
 
